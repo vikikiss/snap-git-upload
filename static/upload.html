@@ -1,0 +1,32 @@
+<html>
+  <head>
+    <title>File Upload</title>
+  </head>
+  <body>
+    <form action="http://localhost:8000/process" method="post" enctype="multipart/form-data">
+      <table>
+        <tr>
+          <td>
+            <label>FileName:</label>
+          </td>
+          <td>
+            <input type="text" name="fileName" />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label>File:</label>
+          </td>
+          <td>
+            <input type="file" name="file" />
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <input type="submit" value="Go" />
+          </td>
+        </tr>
+      </table>
+    </form>
+  </body>
+</html>
