@@ -17,16 +17,33 @@ import           Control.Monad.Trans
 import Data.Monoid
 import Data.Maybe
 import System.FilePath
+import System.Directory
+import Control.Monad
 
 main :: IO ()
 main = quickHttpServe site
 
 site :: Snap ()
-site =
-    ifTop (serveFile "static/main.html") <|>
-    route [ ("process", processHandler)
-          ] <|>
-    dir "upload" (serveFile "static/upload.html")
+site = foldr1 (<|>)
+       [ ifTop (serveFile "static/main.html")
+       , route [ ("process", needLoginCookie $ processHandler)
+               , ("login", serveFile "static/login.html")
+               , ("loginprocess", loginProcessHandler)
+               , ("listingFiles", listFilesHandler)
+               ]
+       , needLoginCookie $ dir "upload" (serveFile "static/upload.html")
+       , dir "files" (serveDirectory "files/")
+       ]
+
+needLoginCookie :: Snap a -> Snap a
+needLoginCookie m = do
+    -- TODO: check cookie
+    cookie <- getCookie "foo"
+    case cookie of
+        Just c -> return ()
+        Nothing -> redirect "/login"
+    hasCookie <- return True
+    if hasCookie then m else redirect "/login"
 
 extForContentType :: ByteString -> Maybe FilePath
 extForContentType "image/jpeg" = Just ".jpg"
@@ -67,6 +84,34 @@ uploadedMessage fileName fileSize =
               , "<p>" <> T.unwords ["Size:", fromString $ show fileSize, "B"] <> "</p>"
               , "<a href='http://google.com/'>link</a>"
               ]
+
+listFilesHandler :: Snap ()
+listFilesHandler = do
+    filePaths <- liftIO $ getDirectoryContents "files"
+    let fps = filter (\fp -> fp /= "." && fp /= "..") $ filePaths
+    forM_ (sort fps) (\filePath -> do
+                                 writeText ("<p><a href='files/" `mappend` fromString filePath `mappend` "'>" `mappend` fromString filePath `mappend` "</a></p>"))
+    -- writeBS $ fromString filePath)
+
+loginProcessHandler :: Snap ()
+loginProcessHandler = do
+    username <- getPostParam "username"
+    password <- getPostParam "password"
+    case username of
+        Nothing -> return ()
+        Just username' -> case password of
+            Nothing -> return ()
+            Just password' -> do
+                when (username' == "viki" && password' == "foo") $ do
+                  let cookie = Cookie{ cookieName="foo"
+                                     , cookieValue="titok"
+                                     , cookieExpires=Nothing
+                                     , cookieDomain=Nothing
+                                     , cookiePath=Nothing
+                                     , cookieSecure=False
+                                     , cookieHttpOnly=True }
+                  modifyResponse $ addResponseCookie cookie
+                  redirect "/"
 
 echoHandler :: Snap ()
 echoHandler = do
