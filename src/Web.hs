@@ -6,23 +6,20 @@ import Job
 import           Control.Applicative
 import           Snap.Core
 import           Snap.Util.FileServe
-import           Data.String
 import           Data.List
 import           Snap.Util.FileUploads
 import           Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
--- import           Data.Text (Text)
--- import qualified Data.Text as T
 import qualified Data.ByteString.UTF8 as BS (toString)
 import           Control.Monad.Trans
-import System.FilePath
-import Control.Monad
-import Data.Char
+import           System.FilePath
+import           Control.Monad
+import           Data.Char
 import qualified Data.ByteString.Base64 as Base64
-import Crypto.Hash.SHA1 (SHA1)
-import Crypto.HMAC (hmac', MacKey(..))
+import           Crypto.Hash.SHA1 (SHA1)
+import           Crypto.HMAC (hmac', MacKey(..))
 import qualified Crypto.Classes as Crypto (encode)
-import Control.Concurrent
+import           Control.Concurrent
 
 site :: Chan Job -> Snap ()
 site chan = foldr1 (<|>)
