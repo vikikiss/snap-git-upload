@@ -31,7 +31,7 @@ site chan = foldr1 (<|>)
                     , ("upload", getUsername >> serveFile "static/upload.html")
                     , ("doUpload", getUsername >>= upload chan)
                     ]
-            , dir "files" (serveDirectory "files/")
+            , serveDirectory "static"
             ]
 
 getUsername :: Snap ByteString
@@ -103,7 +103,7 @@ checkUser username password = return $ username == "viki" && password == "foo"
 logout :: Snap ()
 logout = do
     modifyResponse $ addResponseCookie noLoginCookie
-    redirect "/"
+    redirect "/login"
 
 toLoginCookie :: ByteString -> ByteString -> Cookie
 toLoginCookie username ipAddress = Cookie

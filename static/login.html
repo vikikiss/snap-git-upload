@@ -1,24 +1,28 @@
 <html>
   <head>
     <title>Login</title>
+    <link rel="stylesheet" type="text/css" href="mystyle.css"/>
   </head>
   <body>
     <form action="http://localhost:8000/doLogin" method="post">
-      <table>
-        <tr>
-          <td><label>Username:</label></td>
-          <td><input type="text" name="username"/></td>
-        </tr>
-        <tr>
-          <td><label>Password:</label></td>
-          <td><input type="password" name="password"/></td>
-        </tr>
-        <tr>
-          <td colspan="2">
-            <input type="submit" value="Log in"/>
-          </td>
-        </tr>
-      </table>
+      <fieldset>
+        <legend>Please log in</legend>
+        <table>
+          <tr>
+            <td><label>Username:</label></td>
+            <td><input type="text" name="username"/></td>
+          </tr>
+          <tr>
+            <td><label>Password:</label></td>
+            <td><input type="password" name="password"/></td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <input type="submit" value="Log in"/>
+            </td>
+          </tr>
+        </table>
+      </fieldset>
     </form>
   </body>
 </html>

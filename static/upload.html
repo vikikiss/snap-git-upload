@@ -1,24 +1,27 @@
 <html>
   <head>
     <title>TxtFile Upload</title>
+    <link type="text/css" href="mystyle.css" rel="stylesheet"/>
   </head>
   <body>
     <form action="http://localhost:8000/doUpload" method="post" enctype="multipart/form-data">
-      <table>
-        <tr>
-          <td>
-            <label>File:</label>
-          </td>
-          <td>
-            <input type="file" name="file" />
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2">
-            <input type="submit" value="Go" />
-          </td>
-        </tr>
-      </table>
+      <fieldset>
+        <table>
+          <tr>
+            <td>
+              <label>File:</label>
+            </td>
+            <td>
+              <input type="file" name="file" />
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <input type="submit" value="Go" />
+            </td>
+          </tr>
+        </table>
+      </fieldset>
     </form>
   </body>
 </html>
