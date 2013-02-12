@@ -80,11 +80,16 @@ login :: Snap ()
 login = do
     username <- forceJust $ getPostParam "username"
     password <- forceJust $ getPostParam "password"
-    guard $ username == "viki" && password == "foo"
+
+    b <- liftIO $ checkUser username password
+    guard b <|> redirect "/login"
 
     ipAddress <- getsRequest rqRemoteAddr
     modifyResponse $ addResponseCookie $ toLoginCookie username ipAddress
     redirect "/"
+
+checkUser :: ByteString -> ByteString -> IO Bool
+checkUser username password = return $ username == "viki" && password == "foo"
 
 logout :: Snap ()
 logout = do
