@@ -43,26 +43,34 @@ getUsername = forceJust maybeLoginCookie <|> redirect "/login"
 
 upload :: Chan Job -> ByteString -> Snap ()
 upload chan username = do
-    handleFileUploads "files/txtFiles" defaultUploadPolicy allowTxt $ \parts -> do
+    handleFileUploads "files/uploads" defaultUploadPolicy allowTxt $ \parts -> do
         case find (\(pi, _) -> partFieldName pi == "file") parts of
             Just (pi, Right tmpFileName) -> do
-                bs <- liftIO $ BS.readFile tmpFileName
                 fileName <- case partFileName pi of
-                    Nothing -> do
-                        writeText "<p>Error</p>"
-                        modifyResponse $ setResponseStatus 500 "Internal Server Error"
-                        finishWith =<< getResponse
+                    Nothing -> error500
                     Just fn -> return $ takeFileName (BS.toString fn)
-                let fileName' = "files/txtFiles" </> fileName
-                liftIO $ BS.writeFile fileName' bs
 
-                let job = Job {username = username
-                              , filePath = fileName'}
-                liftIO $ writeChan chan job
+                liftIO $ do
+                    bs <- BS.readFile tmpFileName
+                    (filePath, h) <- openBinaryTempFile "files/queue" "upload.java"
+                    BS.hPut h bs
+                    hClose h
+
+                    let job = Job { username = username
+                                  , filePath = filePath
+                                  , fileName = fileName
+                                  }
+                    writeChan chan job
 
                 modifyResponse (setContentType "text/html")
-                writeText "Upload was successful"
-            _ -> writeBS $ fromString $ show parts
+                writeText "Email will be sent to you."
+            _ -> error500
+
+  where
+    error500 = do
+        writeText "<p>Error</p>"
+        modifyResponse $ setResponseStatus 500 "Internal Server Error"
+        finishWith =<< getResponse
 
 forceJust :: Snap (Maybe a) -> Snap a
 forceJust m = do
