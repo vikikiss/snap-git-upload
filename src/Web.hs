@@ -20,6 +20,7 @@ import           Crypto.Hash.SHA1 (SHA1)
 import           Crypto.HMAC (hmac', MacKey(..))
 import qualified Crypto.Classes as Crypto (encode)
 import           Control.Concurrent
+import           System.IO
 
 site :: Chan Job -> Snap ()
 site chan = foldr1 (<|>)
