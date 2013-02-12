@@ -1,11 +1,12 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE OverloadedStrings #-}
-module ProcessUpload (processUpload, cleanup) where
+module ProcessUpload (processUpload) where
 
 import Job
 
 import Data.ByteString (ByteString)
 import qualified Data.ByteString.UTF8 as BS (toString)
+import qualified Data.ByteString.Char8 as BS (putStrLn)
 
 import Control.Monad (unless, void)
 import Control.Monad.Trans.Either
@@ -15,11 +16,18 @@ import System.FilePath
 import System.Exit
 import Data.Monoid
 
-processUpload :: Job -> EitherT ByteString IO ()
+processUpload :: Job -> IO ()
 processUpload job = do
-    moveToDestination job
-    compile job
-    git job
+    result <- runEitherT $ do
+        moveToDestination job
+        compile job
+        git job
+    cleanup
+    case result of
+        Left err -> do
+            putStrLn "Error!"
+            BS.putStrLn err
+        Right () -> putStrLn "success!"
 
 repoDir :: FilePath
 repoDir = "files/repo"

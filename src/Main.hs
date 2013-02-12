@@ -6,9 +6,7 @@ import Web
 
 import Snap.Http.Server
 import Control.Monad
-import Control.Monad.Trans.Either
 import Control.Concurrent
-import qualified Data.ByteString.Char8 as BS
 
 main :: IO ()
 main = do
@@ -16,11 +14,5 @@ main = do
     forkIO $ do
         forever $ do
             job <- readChan chan
-            ex <- runEitherT $ processUpload job
-            cleanup
-            case ex of
-                Left err -> do
-                    putStrLn "Error!"
-                    BS.putStrLn err
-                Right () -> putStrLn "success!"
+            processUpload job
     quickHttpServe $ site chan
