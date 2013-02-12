@@ -19,6 +19,7 @@ main = do
             ex <- runEitherT $ processUpload job
             case ex of
                 Left err -> do
+                    cleanup
                     putStrLn "Error!"
                     BS.putStrLn err
                 Right () -> putStrLn "success!"

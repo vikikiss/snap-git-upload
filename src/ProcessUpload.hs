@@ -1,12 +1,13 @@
 {-# LANGUAGE ScopedTypeVariables #-}
-module ProcessUpload (processUpload) where
+{-# LANGUAGE OverloadedStrings #-}
+module ProcessUpload (processUpload, cleanup) where
 
 import Job
 
 import Data.ByteString (ByteString)
 import qualified Data.ByteString.UTF8 as BS (toString)
 
-import Control.Monad (unless)
+import Control.Monad (unless, void)
 import Control.Monad.Trans.Either
 import Control.Monad.Trans
 import HSH.Command
@@ -41,6 +42,9 @@ runGit args = runShell "git" $
                   [ "--work-tree", repoDir
                   , "--git-dir", repoDir </> ".git"
                   ] ++ args
+
+cleanup :: IO ()
+cleanup = void $ runEitherT (runGit ["reset", "--hard"])
 
 git :: Job -> EitherT ByteString IO ()
 git job = do
