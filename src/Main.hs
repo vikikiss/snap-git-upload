@@ -17,9 +17,9 @@ main = do
         forever $ do
             job <- readChan chan
             ex <- runEitherT $ processUpload job
+            cleanup
             case ex of
                 Left err -> do
-                    cleanup
                     putStrLn "Error!"
                     BS.putStrLn err
                 Right () -> putStrLn "success!"
